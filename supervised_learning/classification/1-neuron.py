@@ -1,66 +1,71 @@
 #!/usr/bin/env python3
-'''
-    Script Documentation
-'''
+"""
+defines Neuron class that defines
+a single neuron performing binary classification
+"""
+
 
 import numpy as np
 
 
 class Neuron:
-    '''
-        Private instance attributes:
-            W: The weights vector for the neuron. Upon instantiation,
-               it should be initialized using a random normal distribution.
-            b: The bias for the neuron. Upon instantiation,
-               it should be initialized to 0.
-            A: The activated output of the neuron (prediction).
-               Upon instantiation, it should be initialized to 0.
-    '''
+    """
+    class that represents a single neuron performing binary classification
+
+    class constructor:
+        def __init__(self, nx)
+
+    private instance attributes:
+        __W: the weights vector for the neuron
+        __b: the bias for the neuron
+        __A: the activated output of the neuron (prediction)
+    """
+
     def __init__(self, nx):
-        '''
-            class constructor: def __init__(self, nx):
-                nx is the number of input features to the neuron
-            If nx is not an integer,
-                raise a TypeError with the exception: nx must be an integer
-            If nx is less than 1,
-                raise a ValueError with the exception:
-                nx must be a positive integer
-            All exceptions should be raised in the order listed above
-        '''
-        if isinstance(nx, int) is False:
+        """
+        class constructor
+
+        parameters:
+            nx [int]: the number of input features to the neuron
+            If nx is not an integer, raise a TypeError.
+            If nx is less than 1, raise a ValueError.
+
+        sets private instance attributes:
+            __W: the weights vector for the neuron,
+                initialized using a random normal distribution
+            __b: the bias for the neuron,
+                initialized to 0
+            __A: the activated output of the neuron (prediction),
+                initialized to 0
+        """
+        if type(nx) is not int:
             raise TypeError("nx must be an integer")
         if nx < 1:
             raise ValueError("nx must be a positive integer")
-        self.__W = np.random.normal(0, 1, (1, nx))
+        self.__W = np.random.randn(1, nx)
         self.__b = 0
         self.__A = 0
 
     @property
     def W(self):
-        '''
-            Getter function
-            Returns:
-                numpy.ndarray
-                The weight vector of the neuron.
-        '''
-        return self.__W
+        """
+        gets the private instance attribute __W
+        __W is the weights vector for the neuron
+        """
+        return (self.__W)
 
     @property
     def b(self):
-        '''
-            Getter function
-            Returns:
-                float
-                The bias term of the neuron.
-        '''
-        return self.__b
+        """
+        gets the private instance attribute __b
+        __b is the bias for the neuron
+        """
+        return (self.__b)
 
     @property
     def A(self):
-        '''
-            Getter function
-             Returns:
-            float
-                The activated output of the neuron.
-        '''
-        return self.__A
+        """
+        gets the private instance attribute __A
+        __A is the activated output of the neuron
+        """
+        return (self.__A)

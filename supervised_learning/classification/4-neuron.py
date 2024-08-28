@@ -1,120 +1,147 @@
 #!/usr/bin/env python3
-'''
-    Script Documentation
-'''
+"""
+defines Neuron class that defines
+a single neuron performing binary classification
+"""
+
 
 import numpy as np
 
 
 class Neuron:
-    '''
-        Private instance attributes:
-            W: The weights vector for the neuron. Upon instantiation,
-               it should be initialized using a random normal distribution.
-            b: The bias for the neuron. Upon instantiation,
-               it should be initialized to 0.
-            A: The activated output of the neuron (prediction).
-               Upon instantiation, it should be initialized to 0.
-    '''
+    """
+    class that represents a single neuron performing binary classification
+
+    class constructor:
+        def __init__(self, nx)
+
+    private instance attributes:
+        __W: the weights vector for the neuron
+        __b: the bias for the neuron
+        __A: the activated output of the neuron (prediction)
+
+    public methods:
+        def forward_prop(self, X):
+            calculates the forward propagation of the neuron
+        def cost(self, Y, A):
+            calculates the cost of the model using logistic regression
+        def evaluate(self, X, Y):
+            evaluates the neuron's predictions
+    """
+
     def __init__(self, nx):
-        '''
-            class constructor: def __init__(self, nx):
-                nx is the number of input features to the neuron
-            If nx is not an integer,
-                raise a TypeError with the exception: nx must be an integer
-            If nx is less than 1,
-                raise a ValueError with the exception:
-                nx must be a positive integer
-            All exceptions should be raised in the order listed above
-        '''
-        if isinstance(nx, int) is False:
+        """
+        class constructor
+
+        parameters:
+            nx [int]: the number of input features to the neuron
+            If nx is not an integer, raise a TypeError.
+            If nx is less than 1, raise a ValueError.
+
+        sets private instance attributes:
+            __W: the weights vector for the neuron,
+                initialized using a random normal distribution
+            __b: the bias for the neuron,
+                initialized to 0
+            __A: the activated output of the neuron (prediction),
+                initialized to 0
+        """
+        if type(nx) is not int:
             raise TypeError("nx must be an integer")
         if nx < 1:
             raise ValueError("nx must be a positive integer")
-        self.__W = np.random.normal(0, 1, (1, nx))
+        self.__W = np.random.randn(1, nx)
         self.__b = 0
         self.__A = 0
 
     @property
     def W(self):
-        '''
-            Getter function
-            Returns:
-                numpy.ndarray
-                The weight vector of the neuron.
-        '''
-        return self.__W
+        """
+        gets the private instance attribute __W
+        __W is the weights vector for the neuron
+        """
+        return (self.__W)
 
     @property
     def b(self):
-        '''
-            Getter function
-            Returns:
-                float
-                The bias term of the neuron.
-        '''
-        return self.__b
+        """
+        gets the private instance attribute __b
+        __b is the bias for the neuron
+        """
+        return (self.__b)
 
     @property
     def A(self):
-        '''
-            Getter function
-             Returns:
-            float
-                The activated output of the neuron.
-        '''
-        return self.__A
+        """
+        gets the private instance attribute __A
+        __A is the activated output of the neuron
+        """
+        return (self.__A)
 
     def forward_prop(self, X):
-        '''
-            Calculates the forward propagation of the neuron
-            X is a numpy.ndarray with shape(nx, m) that contains the input data
+        """
+        calculates the forward propagation of the neuron
+
+        parameters:
+            X [numpy.ndarray with shape (nx, m)]: contains the input data
                 nx is the number of input features to the neuron
                 m is the number of examples
-            Updates the private attribute __A
-            The neuron should use a sigmoid activation function
-            Returns the private attribute __A
-        '''
-        Z = np.matmul(self.__W, X) + self.__b
-        self.__A = 1.0 / (1.0 + np.exp(-Z))
-        return self.__A
+
+        updates the private attribute __A using sigmoid activation function
+        sigmoid function:
+            __A = 1 / (1 + e^(-z))
+            z = sum of ((__Wi * __Xi) + __b) from i = 0 to nx
+
+        return:
+            the updated private attribute __A
+        """
+        z = np.matmul(self.W, X) + self.b
+        self.__A = 1 / (1 + (np.exp(-z)))
+        return (self.A)
 
     def cost(self, Y, A):
-        '''
-            Calculates the cost of the model using logistic regression
+        """
+        calculates the cost of the model using logistic regression
 
-            Y is a numpy.ndarray with shape (1, m)
-            that contains the correct labels for the input data
+        parameters:
+            Y [numpy.ndarray with shape (1, m)]:
+                contains correct labels for the input data
+            A [numpy.ndarray with shape (1, m)]:
+                contains the activated output of the neuron for each example
 
-            A is a numpy.ndarray with shape (1, m)
-            containing the activated output of the neuron for each example
+        logistic regression loss function:
+            loss = -((Y * log(A)) + ((1 - Y) * log(1 - A)))
+            To avoid log(0) errors, uses (1.0000001 - A) instead of (1 - A)
+        logistic regression cost function:
+            cost = (1 / m) * sum of loss function for all m example
 
-            To avoid division by zero errors,
-            please use 1.0000001 - A instead of 1 - A
-
-            Returns the cost
-        '''
-        # logistic regression cost function
-        cost = -np.sum((Y * np.log(A)) +
-                       ((1 - Y) * np.log(1.0000001 - A))) / Y.shape[1]
-        return cost
+        return:
+            the calculated cost
+        """
+        m = Y.shape[1]
+        m_loss = np.sum((Y * np.log(A)) + ((1 - Y) * np.log(1.0000001 - A)))
+        cost = (1 / m) * (-(m_loss))
+        return (cost)
 
     def evaluate(self, X, Y):
-        '''
-            Evaluates the neuron's predictions
-            X is a numpy.ndarray with shape(nx, m) that contains the input data
+        """
+        evaluates the neuron's predictions
+
+        parameters:
+            X [numpy.ndarray with shape (nx, m)]: contains the input data
                 nx is the number of input features to the neuron
                 m is the number of examples
-            Y is a numpy.ndarray with shape (1, m)
-                that contains the correct labels for the input data
-            Returns the neuron's prediction and the cost of the network,
-            respectively
-                The prediction should be a numpy.ndarray with shape (1, m)
-                    containing the predicted labels for each example
-                The label values should be 1 if the output of the
-                    network is >= 0.5 and 0 otherwise
-        '''
-        self.forward_prop(X)
-        A = np.where(self.__A >= 0.5, 1, 0)
-        cost = self.cost(Y, self.__A)
-        return A, cost
+            Y [numpy.ndarray with shape (1, m)]:
+                contains correct labels for the input data
+
+        returns:
+            the neuron's prediction and the cost of the network, respectively
+            prediction is numpy.ndarray with shape (1, m), containing
+                predicted labels for each example
+            label values should be 1 if the output of the network is >= 0.5,
+                0 if the output of the network is < 0.5
+        """
+        A = self.forward_prop(X)
+        cost = self.cost(Y, A)
+        prediction = np.where(A >= 0.5, 1, 0)
+        return (prediction, cost)
