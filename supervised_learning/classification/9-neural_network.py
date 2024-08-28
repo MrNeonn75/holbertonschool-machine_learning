@@ -1,116 +1,96 @@
 #!/usr/bin/env python3
-"""
-defines NeuralNetwork class that defines
-a neural network with one hidden layer
-performing binary classification
-"""
-
-
+""" Task 9: 9. Privatize NeuralNetwork """
 import numpy as np
 
 
 class NeuralNetwork:
     """
-    class that represents a neural network with one hidden layer
-    performing binary classification
-
-    class constructor:
-        def __init__(self, nx, nodes)
-
-    private instance attributes:
-        __W1: the weights vector for the hidden layer
-        __b1: the bias for the hidden layer
-        __A1: the activated output for the hidden layer
-        __W2: the weights vector for the output neuron
-        __b2: the bias for the output neuron
-        __A2: the activated output for the output neuron
+    Defines a neural network with one hidden layer for performing
+    binary classification.
     """
 
     def __init__(self, nx, nodes):
         """
-        class constructor
-
-        parameters:
-            nx [int]: the number of input features
-                If nx is not an integer, raise a TypeError.
-                If nx is less than 1, raise a ValueError.
-            nodes [int]: the number of nodes found in the hidden layer
-                If nodes is not an integer, raise TypeError.
-                If nodes is less than 1, raise a ValueError.
-
-        sets private instance attributes:
-            __W1: the weights vector for the hidden layer,
-                initialized using a random normal distribution
-            __b1: the bias for the hidden layer,
-                initialized with 0s
-            __A1: the activated output for the hidden layer,
-                initialized to 0
-            __W2: the weights vector for the output neuron,
-                initialized using a random normal distribution
-            __b2: the bias for the output neuron,
-                initialized to 0
-            __A2: the activated output for the output neuron,
-                initialized to 0
+        Initializes the neural network.
         """
-        if type(nx) is not int:
+        if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
         if nx < 1:
             raise ValueError("nx must be a positive integer")
-        if type(nodes) is not int:
+        if not isinstance(nodes, int):
             raise TypeError("nodes must be an integer")
         if nodes < 1:
             raise ValueError("nodes must be a positive integer")
-        self.__W1 = np.random.randn(nodes, nx)
+
+        self.__W1 = np.random.normal(0, 1, (nodes, nx))
         self.__b1 = np.zeros((nodes, 1))
         self.__A1 = 0
-        self.__W2 = np.random.randn(1, nodes)
+        self.__W2 = np.random.normal(0, 1, (1, nodes))
         self.__b2 = 0
         self.__A2 = 0
 
     @property
     def W1(self):
         """
-        gets the private instance attribute __W1
-        __W1 is the weights vector for the hidden layern
+        Retrieves the weight matrix for the hidden layer.
+
+        Returns:
+        numpy.ndarray
+            The weight matrix for the hidden layer.
         """
-        return (self.__W1)
+        return self.__W1
 
     @property
     def b1(self):
         """
-        gets the private instance attribute __b1
-        __b1 is the bias for the hidden layer
+        Retrieves the bias vector for the hidden layer.
+
+        Returns:
+        numpy.ndarray
+            The bias vector for the hidden layer.
         """
-        return (self.__b1)
+        return self.__b1
 
     @property
     def A1(self):
         """
-        gets the private instance attribute __A1
-        __A1 is the activated output of the hidden layer
+        Retrieves the activated output of the hidden layer.
+
+        Returns:
+        float
+            The activated output of the hidden layer.
         """
-        return (self.__A1)
+        return self.__A1
 
     @property
     def W2(self):
         """
-        gets the private instance attribute __W2
-        __W2 is the weights vector for the output neuron
+        Retrieves the weight matrix for the output neuron.
+
+        Returns:
+        numpy.ndarray
+            The weight matrix for the output neuron.
         """
-        return (self.__W2)
+        return self.__W2
 
     @property
     def b2(self):
         """
-        gets the private instance attribute __b2
-        __b2 is the bias for the output neuron
+        Retrieves the bias term for the output neuron.
+
+        Returns:
+        float
+            The bias term for the output neuron.
         """
-        return (self.__b2)
+        return self.__b2
 
     @property
     def A2(self):
         """
-        gets the private instance attribute __A2
-        __A2 is the activated output of the output neuron
+        Retrieves the activated output of the output neuron.
+
+        Returns:
+        float
+            The activated output of the output neuron.
         """
-        return (self.__A2)
+        return self.__A2

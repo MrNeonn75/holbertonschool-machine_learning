@@ -1,90 +1,93 @@
 #!/usr/bin/env python3
-"""
-defines DeepNeuralNetwork class that defines
-a deep neural network performing binary classification
-"""
-
-
+""" Task 17: 17. Privatize DeepNeuralNetwork """
 import numpy as np
 
 
 class DeepNeuralNetwork:
     """
-    class that represents a deep neural network
-    performing binary classification
+    Defines a deep neural network for performing binary classification.
 
-    class constructor:
-        def __init__(self, nx, layers)
+    Attributes:
+        nx (int): Number of input features.
+        layers (list): List representing the number of nodes
+        in each layer of the network.
+        L (int): Number of layers in the neural network.
+        cache (dict): Dictionary to hold the intermediary
+        values of the network (i.e., the activations).
+        weights (dict): Dictionary to hold the weights
+        and biases of the network.
 
-    private instance attributes:
-        L: the number of layers in the neural network
-        cache: a dictionary holding all intermediary values of the network
-        weights: a dictionary holding all weights and biases of the network
+    Methods:
+        __init__(self, nx, layers):
+            Initializes the deep neural network with given input features
+            and nodes in each layer.
+        L(self):
+            Property getter for the number of layers in the network.
+        cache(self):
+            Property getter for the intermediary values in the network.
+        weights(self):
+            Property getter for the weights and biases of the network.
     """
 
     def __init__(self, nx, layers):
         """
-        class constructor
+        Initializes the deep neural network.
 
-        parameters:
-            nx [int]: the number of input features
-                If nx is not an integer, raise a TypeError.
-                If nx is less than 1, raise a ValueError.
-            layers [list]: representing the number of nodes in each layer
-                If layers is not a list, raise TypeError.
-                If elements in layers are not all positive ints,
-                    raise a TypeError.
+        Args:
+            nx (int): Number of input features.
+            layers (list): List representing the number of nodes
+            in each layer of the network.
 
-        sets private instance attributes:
-            __L: the number of layers in the neural network,
-                initialized based on layers
-            __cache: a dictionary holding all intermediary values for network,,
-                initialized as an empty dictionary
-            __weights: a dictionary holding all weights/biases of the network,
-                weights initialized using the He et al. method
-                    using the key W{l} where {l} is the hidden layer
-                biases initialized to 0s
-                    using the key b{l} where {1} is the hidden layer
+        Raises:
+            TypeError: If `nx` is not an integer.
+            ValueError: If `nx` is less than 1.
+            TypeError: If `layers` is not a list of positive integers.
         """
         if type(nx) is not int:
             raise TypeError("nx must be an integer")
         if nx < 1:
             raise ValueError("nx must be a positive integer")
-        if type(layers) is not list or len(layers) < 1:
+        if type(layers) is not list:
             raise TypeError("layers must be a list of positive integers")
-        weights = {}
-        previous = nx
-        for index, layer in enumerate(layers, 1):
-            if type(layer) is not int or layer < 0:
-                raise TypeError("layers must be a list of positive integers")
-            weights["b{}".format(index)] = np.zeros((layer, 1))
-            weights["W{}".format(index)] = (
-                np.random.randn(layer, previous) * np.sqrt(2 / previous))
-            previous = layer
+        if len(layers) == 0:
+            raise TypeError("layers must be a list of positive integers")
+        self.__nx = nx
+        self.__layers = layers
         self.__L = len(layers)
         self.__cache = {}
-        self.__weights = weights
+        self.__weights = {}
+
+        for i in range(self.__L):
+            if not isinstance(layers[i], int) or layers[i] < 1:
+                raise TypeError("layers must be a list of positive integers")
+
+            W_key = f"W{i + 1}"
+            b_key = f"b{i + 1}"
+
+            self.__weights[b_key] = np.zeros((layers[i], 1))
+
+            if i == 0:
+                f = np.sqrt(2 / nx)
+                self.__weights[W_key] = np.random.randn(layers[i], nx) * f
+            else:
+                f = np.sqrt(2 / layers[i - 1])
+                self.__weights[W_key] = \
+                    np.random.randn(layers[i], layers[i - 1]) * f
 
     @property
     def L(self):
-        """
-        gets the private instance attribute __L
-        __L is the number of layers in the neural network
-        """
-        return (self.__L)
+        """ Property getter for the number of
+        layers in the network."""
+        return self.__L
 
     @property
     def cache(self):
-        """
-        gets the private instance attribute __cache
-        __cache holds all the intermediary values of the network
-        """
-        return (self.__cache)
+        """ Property getter for the intermediary
+        values in the network. """
+        return self.__cache
 
     @property
     def weights(self):
-        """
-        gets the private instance attribute __weights
-        __weights holds all the wrights and biases of the network
-        """
-        return (self.__weights)
+        """ Property getter for the weights and
+        biases of the network. """
+        return self.__weights

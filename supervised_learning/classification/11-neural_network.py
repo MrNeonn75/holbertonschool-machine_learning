@@ -1,170 +1,160 @@
 #!/usr/bin/env python3
-"""
-defines NeuralNetwork class that defines
-a neural network with one hidden layer
-performing binary classification
-"""
-
-
+""" Task 10: 10. NeuralNetwork Forward Propagation """
 import numpy as np
 
 
 class NeuralNetwork:
     """
-    class that represents a neural network with one hidden layer
-    performing binary classification
+    Defines a neural network with one hidden layer for performing
+    binary classification.
 
-    class constructor:
-        def __init__(self, nx, nodes)
+    Attributes:
+    W1 : numpy.ndarray
+        The weight matrix for the hidden layer. Shape is (nodes, nx).
+    b1 : numpy.ndarray
+        The bias vector for the hidden layer. Shape is (nodes, 1).
+    A1 : float
+        The activated output of the hidden layer.
+    W2 : numpy.ndarray
+        The weight matrix for the output neuron. Shape is (1, nodes).
+    b2 : float
+        The bias term for the output neuron. Initialized to 0.
+    A2 : float
+        The activated output of the output neuron, representing the final
+        prediction of the network.
 
-    private instance attributes:
-        __W1: the weights vector for the hidden layer
-        __b1: the bias for the hidden layer
-        __A1: the activated output for the hidden layer
-        __W2: the weights vector for the output neuron
-        __b2: the bias for the output neuron
-        __A2: the activated output for the output neuron
-
-    public methods:
-        def forward_prop(self, X):
-            calculates the forward propagation of the neural network
-        def cost(self, Y, A):
-            calculates the cost of the model using logistic regression
+    Methods:
+    __init__(self, nx, nodes)
+        Initializes the neural network with given input features and nodes in
+        the hidden layer.
+    def forward_prop(self, X):
+        Computes the forward propagation of the neural network.
     """
 
     def __init__(self, nx, nodes):
         """
-        class constructor
+        Initializes the neural network.
 
-        parameters:
-            nx [int]: the number of input features
-                If nx is not an integer, raise a TypeError.
-                If nx is less than 1, raise a ValueError.
-            nodes [int]: the number of nodes found in the hidden layer
-                If nodes is not an integer, raise TypeError.
-                If nodes is less than 1, raise a ValueError.
+        Parameters:
+        nx : int
+            The number of input features to the neural network.
+        nodes : int
+            The number of nodes in the hidden layer.
 
-        sets private instance attributes:
-            __W1: the weights vector for the hidden layer,
-                initialized using a random normal distribution
-            __b1: the bias for the hidden layer,
-                initialized with 0s
-            __A1: the activated output for the hidden layer,
-                initialized to 0
-            __W2: the weights vector for the output neuron,
-                initialized using a random normal distribution
-            __b2: the bias for the output neuron,
-                initialized to 0
-            __A2: the activated output for the output neuron,
-                initialized to 0
+        Raises:
+        TypeError
+            If `nx` is not an integer or `nodes` is not an integer.
+        ValueError
+            If `nx` is less than 1 or `nodes` is less than 1.
         """
-        if type(nx) is not int:
+        if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
         if nx < 1:
             raise ValueError("nx must be a positive integer")
-        if type(nodes) is not int:
+        if not isinstance(nodes, int):
             raise TypeError("nodes must be an integer")
         if nodes < 1:
             raise ValueError("nodes must be a positive integer")
-        self.__W1 = np.random.randn(nodes, nx)
+
+        self.__W1 = np.random.normal(0, 1, (nodes, nx))
         self.__b1 = np.zeros((nodes, 1))
         self.__A1 = 0
-        self.__W2 = np.random.randn(1, nodes)
+        self.__W2 = np.random.normal(0, 1, (1, nodes))
         self.__b2 = 0
         self.__A2 = 0
 
     @property
     def W1(self):
         """
-        gets the private instance attribute __W1
-        __W1 is the weights vector for the hidden layern
+        Retrieves the weight matrix for the hidden layer.
+
+        Returns:
+        numpy.ndarray
+            The weight matrix for the hidden layer.
         """
-        return (self.__W1)
+        return self.__W1
 
     @property
     def b1(self):
         """
-        gets the private instance attribute __b1
-        __b1 is the bias for the hidden layer
+        Retrieves the bias vector for the hidden layer.
+
+        Returns:
+        numpy.ndarray
+            The bias vector for the hidden layer.
         """
-        return (self.__b1)
+        return self.__b1
 
     @property
     def A1(self):
         """
-        gets the private instance attribute __A1
-        __A1 is the activated output of the hidden layer
+        Retrieves the activated output of the hidden layer.
+
+        Returns:
+        float
+            The activated output of the hidden layer.
         """
-        return (self.__A1)
+        return self.__A1
 
     @property
     def W2(self):
         """
-        gets the private instance attribute __W2
-        __W2 is the weights vector for the output neuron
+        Retrieves the weight matrix for the output neuron.
+
+        Returns:
+        numpy.ndarray
+            The weight matrix for the output neuron.
         """
-        return (self.__W2)
+        return self.__W2
 
     @property
     def b2(self):
         """
-        gets the private instance attribute __b2
-        __b2 is the bias for the output neuron
+        Retrieves the bias term for the output neuron.
+
+        Returns:
+        float
+            The bias term for the output neuron.
         """
-        return (self.__b2)
+        return self.__b2
 
     @property
     def A2(self):
         """
-        gets the private instance attribute __A2
-        __A2 is the activated output of the output neuron
+        Retrieves the activated output of the output neuron.
+
+        Returns:
+        float
+            The activated output of the output neuron.
         """
-        return (self.__A2)
+        return self.__A2
 
     def forward_prop(self, X):
         """
-        calculates the forward propagation of the neural network
-
-        parameters:
-            X [numpy.ndarray with shape (nx, m)]: contains the input data
-                nx is the number of input features to the neuron
-                m is the number of examples
-
-        updates the private attributes __A1 and __A2
-            using sigmoid activation function
-        sigmoid function:
-            __A = 1 / (1 + e^(-z))
-            z = sum of ((__Wi * __Xi) + __b) from i = 0 to nx
-
-        return:
-            the updated private attributes __A1 and __A2, respectively
+        Computes the forward propagation of the neural network.
         """
-        z1 = np.matmul(self.W1, X) + self.b1
-        self.__A1 = 1 / (1 + (np.exp(-z1)))
-        z2 = np.matmul(self.W2, self.__A1) + self.b2
-        self.__A2 = 1 / (1 + (np.exp(-z2)))
-        return (self.A1, self.A2)
+        C1 = np.matmul(self.__W1, X) + self.__b1
+        self.__A1 = 1 / (1 + np.exp(-C1))
+        C2 = np.matmul(self.__W2, self.__A1) + self.__b2
+        self.__A2 = 1 / (1 + np.exp(-C2))
+        return self.__A1, self.__A2
 
     def cost(self, Y, A):
         """
-        calculates the cost of the model using logistic regression
+        Calculates the cost of the model using logistic regression.
 
-        parameters:
-            Y [numpy.ndarray with shape (1, m)]:
-                contains correct labels for the input data
-            A [numpy.ndarray with shape (1, m)]:
-                contains the activated output of the neuron for each example
+        Parameters:
+        Y : numpy.ndarray
+            The correct labels for the input data. Shape is (1, m).
+        A : numpy.ndarray
+            The activated output of the neuron for the input data. Shape is
+            (1, m).
 
-        logistic regression loss function:
-            loss = -((Y * log(A)) + ((1 - Y) * log(1 - A)))
-            To avoid log(0) errors, uses (1.0000001 - A) instead of (1 - A)
-        logistic regression cost function:
-            cost = (1 / m) * sum of loss function for all m example
-
-        return:
-            the calculated cost
+        Returns:
+        float
+            The cost of the model.
         """
         m = Y.shape[1]
-        m_loss = np.sum((Y * np.log(A)) + ((1 - Y) * np.log(1.0000001 - A)))
-        cost = (1 / m) * (-(m_loss))
-        return (cost)
+        cost = -np.sum((Y * np.log(A)) + ((1 - Y) * np.log(1.0000001 - A)))
+        cost = cost / m
+        return cost

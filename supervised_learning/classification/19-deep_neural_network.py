@@ -1,149 +1,148 @@
 #!/usr/bin/env python3
-"""
-defines DeepNeuralNetwork class that defines
-a deep neural network performing binary classification
-"""
-
-
+""" Task 19: 19. DeepNeuralNetwork Cost """
 import numpy as np
 
 
 class DeepNeuralNetwork:
     """
-    class that represents a deep neural network
-    performing binary classification
+    Defines a deep neural network for performing binary classification.
 
-    class constructor:
-        def __init__(self, nx, layers)
+    Attributes:
+        nx (int): Number of input features.
+        layers (list): List representing the number of nodes
+        in each layer of the network.
+        L (int): Number of layers in the neural network.
+        cache (dict): Dictionary to hold the intermediary
+        values of the network (i.e., the activations).
+        weights (dict): Dictionary to hold the weights
+        and biases of the network.
 
-    private instance attributes:
-        L: the number of layers in the neural network
-        cache: a dictionary holding all intermediary values of the network
-        weights: a dictionary holding all weights and biases of the network
-
-    public methods:
-        def forward_prop(self, X):
-            calculates the forward propagation of the neural network
-        def cost(self, Y, A):
-            calculates the cost of the model using logistic regression
+    Methods:
+        __init__(self, nx, layers):
+            Initializes the deep neural network with given input features
+            and nodes in each layer.
+        L(self):
+            Property getter for the number of layers in the network.
+        cache(self):
+            Property getter for the intermediary values in the network.
+        weights(self):
+            Property getter for the weights and biases of the network.
+        forward_prop(self, X)
+            Calculates the forward propagation of the neural network.
+        cost(self, Y, A)
+            Calculates the cost of the model using logistic regression.
     """
 
     def __init__(self, nx, layers):
         """
-        class constructor
+        Initializes the deep neural network.
 
-        parameters:
-            nx [int]: the number of input features
-                If nx is not an integer, raise a TypeError.
-                If nx is less than 1, raise a ValueError.
-            layers [list]: representing the number of nodes in each layer
-                If layers is not a list, raise TypeError.
-                If elements in layers are not all positive ints,
-                    raise a TypeError.
+        Args:
+            nx (int): Number of input features.
+            layers (list): List representing the number of nodes
+            in each layer of the network.
 
-        sets private instance attributes:
-            __L: the number of layers in the neural network,
-                initialized based on layers
-            __cache: a dictionary holding all intermediary values for network,,
-                initialized as an empty dictionary
-            __weights: a dictionary holding all weights/biases of the network,
-                weights initialized using the He et al. method
-                    using the key W{l} where {l} is the hidden layer
-                biases initialized to 0s
-                    using the key b{l} where {1} is the hidden layer
+        Raises:
+            TypeError: If `nx` is not an integer.
+            ValueError: If `nx` is less than 1.
+            TypeError: If `layers` is not a list of positive integers.
         """
         if type(nx) is not int:
             raise TypeError("nx must be an integer")
         if nx < 1:
             raise ValueError("nx must be a positive integer")
-        if type(layers) is not list or len(layers) < 1:
+        if type(layers) is not list:
             raise TypeError("layers must be a list of positive integers")
-        weights = {}
-        previous = nx
-        for index, layer in enumerate(layers, 1):
-            if type(layer) is not int or layer < 0:
-                raise TypeError("layers must be a list of positive integers")
-            weights["b{}".format(index)] = np.zeros((layer, 1))
-            weights["W{}".format(index)] = (
-                np.random.randn(layer, previous) * np.sqrt(2 / previous))
-            previous = layer
+        if len(layers) == 0:
+            raise TypeError("layers must be a list of positive integers")
+        self.__nx = nx
+        self.__layers = layers
         self.__L = len(layers)
         self.__cache = {}
-        self.__weights = weights
+        self.__weights = {}
+
+        for i in range(self.__L):
+            if not isinstance(layers[i], int) or layers[i] < 1:
+                raise TypeError("layers must be a list of positive integers")
+
+            W_key = f"W{i + 1}"
+            b_key = f"b{i + 1}"
+
+            self.__weights[b_key] = np.zeros((layers[i], 1))
+
+            if i == 0:
+                f = np.sqrt(2 / nx)
+                self.__weights[W_key] = np.random.randn(layers[i], nx) * f
+            else:
+                f = np.sqrt(2 / layers[i - 1])
+                self.__weights[W_key] = \
+                    np.random.randn(layers[i], layers[i - 1]) * f
 
     @property
     def L(self):
-        """
-        gets the private instance attribute __L
-        __L is the number of layers in the neural network
-        """
-        return (self.__L)
+        """ Property getter for the number of
+        layers in the network."""
+        return self.__L
 
     @property
     def cache(self):
-        """
-        gets the private instance attribute __cache
-        __cache holds all the intermediary values of the network
-        """
-        return (self.__cache)
+        """ Property getter for the intermediary
+        values in the network. """
+        return self.__cache
 
     @property
     def weights(self):
-        """
-        gets the private instance attribute __weights
-        __weights holds all the wrights and biases of the network
-        """
-        return (self.__weights)
+        """ Property getter for the weights and
+        biases of the network. """
+        return self.__weights
 
     def forward_prop(self, X):
         """
-        calculates the forward propagation of the neuron
+        Calculates the forward propagation of the neural network.
 
-        parameters:
-            X [numpy.ndarray with shape (nx, m)]: contains the input data
-                nx is the number of input features to the neuron
-                m is the number of examples
+        Args:
+            X (numpy.ndarray): Array of shape (nx, m) containing
+            the input data.
+                - nx (int): Number of input features.
+                - m (int): Number of examples.
 
-        updates the private attribute __cache using sigmoid activation function
-        sigmoid function:
-            activated output = 1 / (1 + e^(-z))
-            z = sum of ((__Wi * __Xi) + __b) from i = 0 to nx
-        activated outputs of each layer are saved in __cache
-            as A{l} where {l} is the hidden layer
-        X is saved to __cache under key A0
-
-        return:
-            the output of the neural network and the cache, respectively
+        Returns:
+            tuple: A tuple containing:
+                - numpy.ndarray: The activations of the output layer
+                (A_L) with shape (1, m).
+                - dict: The cache dictionary containing the intermediary
+                activations of each layer.
         """
-        self.__cache["A0"] = X
-        for index in range(self.L):
-            W = self.weights["W{}".format(index + 1)]
-            b = self.weights["b{}".format(index + 1)]
-            z = np.matmul(W, self.cache["A{}".format(index)]) + b
-            A = 1 / (1 + (np.exp(-z)))
-            self.__cache["A{}".format(index + 1)] = A
-        return (A, self.cache)
+        self.__cache['A0'] = X
+
+        for i in range(self.__L):
+            W_key = "W{}".format(i + 1)
+            b_key = "b{}".format(i + 1)
+            A_key_prev = "A{}".format(i)
+            A_key_forw = "A{}".format(i + 1)
+
+            Z = np.matmul(self.__weights[W_key], self.__cache[A_key_prev]) \
+                + self.__weights[b_key]
+            self.__cache[A_key_forw] = 1 / (1 + np.exp(-Z))
+
+        return self.__cache[A_key_forw], self.__cache
 
     def cost(self, Y, A):
         """
-        calculates the cost of the model using logistic regression
+        Calculates the cost of the model using logistic regression.
 
-        parameters:
-            Y [numpy.ndarray with shape (1, m)]:
-                contains correct labels for the input data
-            A [numpy.ndarray with shape (1, m)]:
-                contains the activated output of the neuron for each example
+        Args:
+            Y (numpy.ndarray): Array with shape (1, m)
+            containing the correct labels for the input data.
+                - m (int): Number of examples.
+            A (numpy.ndarray): Array with shape (1, m)
+            containing the activated output of the network for
+            each example.
 
-        logistic regression loss function:
-            loss = -((Y * log(A)) + ((1 - Y) * log(1 - A)))
-            To avoid log(0) errors, uses (1.0000001 - A) instead of (1 - A)
-        logistic regression cost function:
-            cost = (1 / m) * sum of loss function for all m example
-
-        return:
-            the calculated cost
+        Returns:
+            float: The cost of the model, calculated using the
+            logistic regression cost function.
         """
-        m = Y.shape[1]
-        m_loss = np.sum((Y * np.log(A)) + ((1 - Y) * np.log(1.0000001 - A)))
-        cost = (1 / m) * (-(m_loss))
-        return (cost)
+        cost = -np.sum((Y * np.log(A)) +
+                       ((1 - Y) * np.log(1.0000001 - A))) / Y.shape[1]
+        return cost

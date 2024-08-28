@@ -1,38 +1,33 @@
 #!/usr/bin/env python3
-"""
-defines function that converts a numeric label vector
-into a one-hot matrix
-"""
-
-
+""" Task 24: 24. One-Hot Encode """
 import numpy as np
 
 
 def one_hot_encode(Y, classes):
     """
-    converts a numeric label vector into a one-hot matrix
+    Converts a numeric label vector into a one-hot encoded
+    matrix.
 
-    parameters:
-        Y [numpy.ndarray with shape (m,)]: contains numeric class labels
-            m is the number of examples
-        classes [int]: the maximum number of classes found in Y
+    Args:
+        Y (numpy.ndarray): Array of shape (m,) containing
+        the numeric class labels.
+            - m (int): The number of examples.
+        classes (int): The total number of unique classes.
 
-    returns:
-        one-hot encoding of Y with shape (classes, m)
-            or None if fails
+    Returns:
+        numpy.ndarray: A one-hot encoded matrix of shape
+        (classes, m), where each column
+        corresponds to a one-hot encoded vector for each
+        label in `Y`.
+        - If the input is invalid, returns None.
     """
-    # if type(Y) is not np.ndarray or len(Y.shape) != 1 or len(Y) < 1:
-    # return None
-    # if type(classes) is not int or classes != (Y.max() + 1):
-    # return None
-    # one_hot = np.eye(classes)[Y].transpose()
-    # return one_hot
-    if type(Y) is not np.ndarray:
-        return None
-    if type(classes) is not int:
+    if Y is None\
+       or type(Y) is not np.ndarray\
+       or type(classes) is not int:
         return None
     try:
-        one_hot = np.eye(classes)[Y].transpose()
-        return one_hot
-    except Exception as err:
+        matrix = np.zeros((len(Y), classes))
+        matrix[np.arange(len(Y)), Y] = 1
+        return matrix.T
+    except Exception:
         return None
