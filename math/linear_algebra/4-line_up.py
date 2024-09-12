@@ -12,7 +12,7 @@ def add_arrays(arr1, arr2):
         the sum of arrays: new matrix
 
     """
-    if len(arr1) != len(arr2):
+    if (len(arr1) != len(arr2)):
         return None
     else:
         return [sum(x) for x in zip(arr1, arr2)]
