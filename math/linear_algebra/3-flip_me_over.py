@@ -12,7 +12,7 @@ def matrix_transpose(matrix):
         new_matrix: Transposed matrix
 
     """
-    if type(matrix[0]) != list:
+    if (not isinstance(matrix[0], list)):
         return [len(matrix)]
     else:
         new_matrix = [[matrix[j][i] for j in range(len(matrix))]
