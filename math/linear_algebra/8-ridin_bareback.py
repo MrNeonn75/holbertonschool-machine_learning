@@ -11,7 +11,7 @@ def mat_mul(mat1, mat2):
     Return:
         the new mat: new_mat
     """
-    if len(mat1[0]) != len(mat2):
+    if (len(mat1[0]) != len(mat2)):
         return None
     else:
         new_mat = []
