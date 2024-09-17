@@ -9,7 +9,9 @@ The x-axis should range from 0 to 20,000
 The y-axis should range from 0 to 1
 x ↦ y1 should be plotted with a dashed red line
 x ↦ y2 should be plotted with a solid green line
-A legend labeling x ↦ y1 as C-14 and x ↦ y2 as Ra-226 should be placed in the upper right hand corner of the plot
+
+A legend labeling x ↦ y1 as C-14 and x ↦ y2 as Ra-226 should be placed in 
+the upper right hand corner of the plot
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,10 +39,10 @@ def two():
     plt.title("Exponential Decay of Radioactive Elements")
     plt.xlim(0, 20000)
     plt.ylim(0, 1)
-    
+
     plt.plot(x, y1, c='red', linestyle='dashed', label='C-14')
     plt.plot(x, y2, c='green', label='Ra-226')
-    
+
     plt.legend()
-    
+
     plt.show()
