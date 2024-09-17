@@ -2,7 +2,7 @@
 """
 Complete the following source code to plot all 5 previous graphs in one figure:
 
-All axis labels and plot titles should have a font size of x-small 
+All axis labels and plot titles should have a font size of x-small
     (to fit nicely in one figure)
 The plots should make a 3 x 2 grid
 The last plot should take up two column widths (see below)

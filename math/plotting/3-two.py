@@ -10,8 +10,8 @@ The y-axis should range from 0 to 1
 x ↦ y1 should be plotted with a dashed red line
 x ↦ y2 should be plotted with a solid green line
 
-A legend labeling x ↦ y1 as C-14 and x ↦ y2 as Ra-226 should be placed in 
-the upper right hand corner of the plot
+A legend labeling x ↦ y1 as C-14 and x ↦ y2 as Ra-226 should be placed in
+    the upper right hand corner of the plot
 """
 import numpy as np
 import matplotlib.pyplot as plt
