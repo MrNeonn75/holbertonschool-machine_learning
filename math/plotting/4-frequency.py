@@ -16,10 +16,10 @@ import matplotlib.pyplot as plt
 def frequency():
     """
     Plot a histogram of student scores for a project
-    
+
     Args:
         None
-    
+
     Return:
         None
     """

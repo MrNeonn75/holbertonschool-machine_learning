@@ -31,10 +31,10 @@ import matplotlib.pyplot as plt
 def bars():
     """
     Plot a stacked bar graph
-    
+
     Args:
         None
-    
+
     Return:
         None
     """
@@ -49,12 +49,10 @@ def bars():
     bar_width = 0.5
     y_offset = np.zeros(len(columns))
 
-
     for row in range(n_rows):
         plt.bar(index, fruit[row], bar_width, bottom=y_offset,
                 color=colors[row], label=rows[row])
         y_offset = y_offset + fruit[row]
-
 
     plt.legend()
     plt.yticks(np.arange(0, 90, 10))
