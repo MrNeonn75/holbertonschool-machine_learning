@@ -14,6 +14,12 @@ import matplotlib.pyplot as plt
 def scatter():
     """
     To plot x ↦ y as a scatter plot:
+    
+    Args:
+        None
+        
+    Return:
+        None
     """
     mean = [69, 0]
     cov = [[15, 8], [8, 15]]

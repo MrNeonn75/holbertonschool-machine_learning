@@ -15,6 +15,12 @@ The x-axis should range from 0 to 28650
 def change_scale():
     """
     To plot x ↦ y as a line graph
+    
+    Args:
+        None
+        
+    Return:
+        None
     """
     x = np.arange(0, 28651, 5730)
     r = np.log(0.5)

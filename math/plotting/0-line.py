@@ -11,7 +11,13 @@ import matplotlib.pyplot as plt
 
 def line():
     """
-    To plot y as a line graph:
+    To plot y as a line graph
+    
+    Args:
+        None
+        
+    Return:
+        None
     """
     y = np.arange(0, 11) ** 3
 
