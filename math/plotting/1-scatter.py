@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import numpy as np
-import matplotlib.pyplot as plt
 """
     Complete the following source code to plot x ↦ y as a scatter plot:
 
@@ -9,15 +7,17 @@ import matplotlib.pyplot as plt
     The title should be Men's Height vs Weight
     The data should be plotted as magenta points
 """
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def scatter():
     """
-    To plot x ↦ y as a scatter plot:
-    
+    Plot x ↦ y as a scatter plot:
+
     Args:
         None
-        
+
     Return:
         None
     """

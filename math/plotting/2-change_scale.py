@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import numpy as np
-import matplotlib.pyplot as plt
 """
 Complete the following source code to plot x ↦ y as a line graph:
 
@@ -10,15 +8,17 @@ The title should be Exponential Decay of C-14
 The y-axis should be logarithmically scaled
 The x-axis should range from 0 to 28650
 """
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def change_scale():
     """
-    To plot x ↦ y as a line graph
-    
+    Plot x ↦ y as a line graph
+
     Args:
         None
-        
+
     Return:
         None
     """

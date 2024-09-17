@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-import numpy as np
-import matplotlib.pyplot as plt
 """
     Complete the following source code to plot y as a line graph:
 
     y should be plotted as a solid red line
     The x-axis should range from 0 to 10
 """
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def line():
     """
-    To plot y as a line graph
-    
+    Plot y as a line graph
+
     Args:
         None
-        
+
     Return:
         None
     """
