@@ -1,90 +1,115 @@
 #!/usr/bin/env python3
-""" This module defines the autoencoder function. """
+""" Task 3: 3. Variational Autoencoder """
 import tensorflow.keras as keras
+import tensorflow as tf
 
 
-def autoencoder(input_dims, hidden_layers, latent_dims):
+def autoencoder(input_dim, hidden_units, latent_dim):
     """
-    This function creates a variational autoencoder.
+    Creates a Variational Autoencoder (VAE) model consisting
+    of an encoder and a decoder.
+
     Args:
-        input_dims (int): is an integer containing the dimensions of the model
-            input.
-        hidden_layers (list): is a list containing the number of nodes for each
-            hidden layer in the encoder, respectively. The hidden layers should
-            be reversed for the decoder.
-        latent_dims (int): is an integer containing the dimensions of the
-            latent space representation.
+        input_dim (int): The dimensionality of the input data.
+        hidden_units (list of int): A list specifying the number
+        of units in each hidden layer of the encoder and decoder.
+        latent_dim (int): The dimensionality of the latent space
+        (i.e., the output dimension of the encoder's latent
+        representation).
+
     Returns:
-        encoder (Model): The encoder model, which outputs the latent
-            representation, mean, and log variance.
-        decoder (Model): The decoder model.
-        auto (Model): The full autoencoder model.
+        encoder_model (keras.Model): The encoder model that maps
+        input data to a latent space.
+        decoder_model (keras.Model): The decoder model that
+        reconstructs the input data from the latent space.
+        vae (keras.Model): The complete VAE model combining
+        both the encoder and decoder, with a custom loss function
+        (reconstruction loss + KL divergence).
     """
-    # --- ENCODER ---
-    # Input layer for the encoder
-    inputs = keras.Input(shape=(input_dims,))
+    # Define the input layer with the specified input dimension
+    input_layer = keras.Input(shape=(input_dim,))
+    hidden_layer = input_layer
 
-    # Building the encoder hidden layers
-    x = inputs
-    for nodes in hidden_layers:
-        # Fully connected layer with ReLU activation
-        x = keras.layers.Dense(nodes, activation='relu')(x)
+    # Build the encoder with the specified hidden layers
+    for units in hidden_units:
+        hidden_layer = keras.layers.Dense(
+            units, activation='relu')(hidden_layer)
 
-    # Latent space: output mean and log variance for reparameterization trick
-    # Mean layer with linear activation
-    z_mean = keras.layers.Dense(latent_dims, activation=None)(x)
-    # Log variance layer with linear activation
-    z_log_var = keras.layers.Dense(latent_dims, activation=None)(x)
+    # Define the mean and log variance layers for the latent space
+    mean_layer = keras.layers.Dense(latent_dim, activation=None)(hidden_layer)
+    log_var_layer = keras.layers.Dense(
+        latent_dim, activation=None)(hidden_layer)
 
-    # Reparameterization trick to sample from the latent space
-    def sampling(args):
-        z_mean, z_log_var = args
-        epsilon = keras.backend.random_normal(
-            shape=(keras.backend.shape(z_mean)[0], latent_dims))
-        return z_mean + keras.backend.exp(0.5 * z_log_var) * epsilon
+    def reparametrize(args):
+        """
+        Reparameterization trick to sample from the latent space
+        using the mean and log variance.
 
-    # Apply the sampling function
-    z = keras.layers.Lambda(
-        sampling, output_shape=(latent_dims,))([z_mean, z_log_var])
+        Args:
+            args (list): A list containing the mean and log variance
+            of the latent space.
+
+        Returns:
+            latent_sample: A tensor sampled from the latent space
+            using the reparameterization trick.
+        """
+        mean, log_var = args
+        batch_size = tf.shape(mean)[0]
+        latent_size = tf.shape(mean)[1]
+        noise = tf.random.normal(shape=(batch_size, latent_size))
+        return mean + tf.exp(0.5 * log_var) * noise
+
+    # Sample from the latent space using the reparameterization method
+    latent_sample = keras.layers.Lambda(
+        reparametrize)([mean_layer, log_var_layer])
 
     # Define the encoder model
-    encoder = keras.Model(inputs, [z, z_mean, z_log_var], name="encoder")
+    encoder_model = keras.Model(
+        inputs=input_layer,
+        outputs=[latent_sample, mean_layer, log_var_layer],
+        name='encoder'
+    )
 
-    # --- DECODER ---
-    # Input layer for the decoder (latent space representation)
-    latent_inputs = keras.Input(shape=(latent_dims,))
+    # Define the input for the decoder with the shape of the latent space
+    decoder_input = keras.Input(shape=(latent_dim,))
+    hidden_decoded = decoder_input
 
-    # Building the decoder hidden layers (reverse of encoder)
-    x = latent_inputs
-    for nodes in reversed(hidden_layers):
-        x = keras.layers.Dense(nodes, activation='relu')(x)
+    # Build the decoder with the hidden layers in reverse order
+    for units in reversed(hidden_units):
+        hidden_decoded = keras.layers.Dense(
+            units, activation='relu')(hidden_decoded)
 
-    # Output layer to reconstruct the original input
-    outputs = keras.layers.Dense(input_dims, activation='sigmoid')(x)
+    # Final layer to match the input dimension with sigmoid activation
+    output_layer = keras.layers.Dense(
+        input_dim, activation='sigmoid')(hidden_decoded)
 
     # Define the decoder model
-    decoder = keras.Model(latent_inputs, outputs, name="decoder")
+    decoder_model = keras.Model(
+        inputs=decoder_input,
+        outputs=output_layer,
+        name='decoder'
+    )
 
-    # --- FULL AUTOENCODER ---
-    # Connect encoder and decoder
-    outputs = decoder(encoder(inputs)[0])
+    # Combine the encoder and decoder into the autoencoder model
+    final_output = decoder_model(encoder_model(input_layer)[0])
+    vae = keras.Model(inputs=input_layer, outputs=final_output, name='vae')
 
-    # Define the full autoencoder model
-    auto = keras.Model(inputs, outputs, name="autoencoder")
+    # Calculate the reconstruction loss"""
+    reconstruction_loss = keras.losses.binary_crossentropy(
+        input_layer, final_output)
+    reconstruction_loss *= input_dim
 
-    # Custom loss: binary cross-entropy + KL divergence
-    reconstruction_loss = keras.losses.binary_crossentropy(inputs, outputs)
-    reconstruction_loss *= input_dims
+    # Define KL divergence loss
+    kl_divergence_loss = 1 + log_var_layer - \
+        tf.square(mean_layer) - tf.exp(log_var_layer)
+    kl_divergence_loss = tf.reduce_sum(kl_divergence_loss, axis=-1)
+    kl_divergence_loss *= -0.5
 
-    kl_loss = -0.5 * keras.backend.sum(
-        1 + z_log_var - keras.backend.square(
-            z_mean) - keras.backend.exp(z_log_var), axis=-1)
-    vae_loss = keras.backend.mean(reconstruction_loss + kl_loss)
+    # Combine the reconstruction loss and KL divergence loss
+    total_loss = tf.reduce_mean(reconstruction_loss + kl_divergence_loss)
+    vae.add_loss(total_loss)
 
-    # Add the custom loss to the model
-    auto.add_loss(vae_loss)
+    # Compile the autoencoder model
+    vae.compile(optimizer='adam')
 
-    # Compile the model with Adam optimizer
-    auto.compile(optimizer=keras.optimizers.Adam())
-
-    return encoder, decoder, auto
+    return encoder_model, decoder_model, vae
