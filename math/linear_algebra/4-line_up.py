@@ -12,10 +12,11 @@ def add_arrays(arr1, arr2):
         the sum of arrays: new matrix
 
     """
-    if(len(arr1) == len(arr2)):
+    if (len(arr1) == len(arr2)):
         new_arr = []
         for i in range(len(arr1)):
             new_arr.append(arr1[i] + arr2[i])
-            
+
         return new_arr
-    else: return None
+    else:
+        return None

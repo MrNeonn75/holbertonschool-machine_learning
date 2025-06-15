@@ -12,12 +12,15 @@ def add_matrices2D(mat1, mat2):
         the sum of matrix: new matrix
 
     """
-    if (len(mat1) != len(mat2)):
-        return None
-    elif (len(mat1[0]) != len(mat2[0])):
+    if (len(mat1) != len(mat2) or len(mat1[0]) != len(mat2[0])):
         return None
     else:
-        new_mat = [[mat1[i][j] + mat2[i][j]
-                    for j in range(len(mat1[0]))] for i in range(len(mat1))]
-
-        return new_mat
+        new_mat = []
+        tmp = []
+        for i in range(len(mat1)):
+            for x in range(len(mat1[0])):
+               tmp.append(mat1[i][x] + mat2[i][x])
+            new_mat.append(tmp)
+            tmp = []
+            
+        return new_mat 
