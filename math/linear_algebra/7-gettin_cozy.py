@@ -16,13 +16,11 @@ def cat_matrices2D(mat1, mat2, axis=0):
 
     """
 
-    mat_new=[]
-    if (axis==0):
-        mat_new=mat1+mat2
-    elif (axis==1):
-        for i in range(len(mat1)):
-            mat_new.append(mat1[i]+mat2[i])
+    if ((len(mat1[0]) == len(mat2[0])) and axis == 0):
+        new_mat = mat1 + mat2
+        return new_mat
+    elif ((len(mat1) == len(mat2)) and axis == 1):
+        new_mat = [mat1[x] + mat2[x] for x in range(len(mat1))]
+        return new_mat
     else:
         return None
-   
-    return mat_new
